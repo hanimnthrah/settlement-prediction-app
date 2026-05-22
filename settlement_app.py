@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
+import matplotlib.pyplot as plt
 
 # ============================================================
 # 1. LOAD TRAINED MODELS AND SCALERS
@@ -41,15 +42,13 @@ def make_input_data(input_values):
 def predict_ann(input_values):
     input_data = make_input_data(input_values)
     input_scaled = scaler_ann.transform(input_data)
-    prediction = ann.predict(input_scaled)[0]
-    return prediction
+    return ann.predict(input_scaled)[0]
 
 
 def predict_svr(input_values):
     input_data = make_input_data(input_values)
     input_scaled = scaler_svr.transform(input_data)
-    prediction = svr.predict(input_scaled)[0]
-    return prediction
+    return svr.predict(input_scaled)[0]
 
 
 def predict_gpr(input_values):
@@ -108,7 +107,105 @@ def recommend_safe_height(
 
 
 # ============================================================
-# 5. APP LAYOUT
+# 5. PARAMETRIC GRAPH FUNCTION
+# ============================================================
+def plot_cc_settlement_graph(gamma_emb, Hemb, B1, GWL, Dpeat, eo):
+    cc_values = np.array([1.0, 3.0, 5.0])
+
+    peat_types = {
+        "Fibric": {
+            "gamma_soil": 8.0,
+            "gamma_sat": 11.0,
+            "marker": "o"
+        },
+        "Hemic": {
+            "gamma_soil": 10.0,
+            "gamma_sat": 13.0,
+            "marker": "s"
+        },
+        "Sapric": {
+            "gamma_soil": 12.0,
+            "gamma_sat": 15.0,
+            "marker": "D"
+        }
+    }
+
+    fig, ax = plt.subplots(figsize=(8, 5.5))
+
+    for peat_name, values in peat_types.items():
+        settlement_results = []
+
+        for Cc_value in cc_values:
+            input_values = [
+                gamma_emb,
+                Hemb,
+                B1,
+                values["gamma_soil"],
+                values["gamma_sat"],
+                GWL,
+                Dpeat,
+                Cc_value,
+                eo
+            ]
+
+            ann_pred, svr_pred, gpr_pred, gpr_uncertainty, average_pred = predict_all_models(input_values)
+            settlement_results.append(average_pred * 1000)
+
+        ax.plot(
+            cc_values,
+            settlement_results,
+            color="black",
+            linewidth=2,
+            marker=values["marker"],
+            markersize=8,
+            markerfacecolor="white",
+            markeredgecolor="black",
+            label=peat_name
+        )
+
+    ax.set_xlabel("Compression index, Cc", fontsize=12)
+    ax.set_ylabel("Total settlement, ST (mm)", fontsize=12)
+
+    ax.legend(
+        loc="upper left",
+        frameon=True,
+        edgecolor="black",
+        fancybox=False
+    )
+
+    ax.grid(False)
+    ax.minorticks_on()
+    ax.tick_params(axis="both", which="major", direction="in", length=6, width=1)
+    ax.tick_params(axis="both", which="minor", direction="in", length=3, width=1)
+
+    info_text = (
+        f"γemb (kN/m³) = {gamma_emb:g}\n"
+        f"Hemb (m) = {Hemb:g}\n"
+        f"B1 (m) = {B1:g}\n"
+        f"GWL (m) = {GWL:g}\n"
+        f"Dpeat (m) = {Dpeat:g}\n"
+        f"eo = {eo:g}"
+    )
+
+    ax.text(
+        0.69,
+        0.08,
+        info_text,
+        transform=ax.transAxes,
+        fontsize=11,
+        bbox=dict(facecolor="white", edgecolor="black", boxstyle="square")
+    )
+
+    for spine in ax.spines.values():
+        spine.set_linewidth(1.3)
+        spine.set_color("black")
+
+    fig.tight_layout()
+    return fig
+
+
+# ============================================================
+# 6. APP LAYOUT
 # ============================================================
 st.set_page_config(
     page_title="Settlement Prediction App",
@@ -242,7 +339,7 @@ st.markdown(
 
 
 # ============================================================
-# 6. USER INPUT SECTION
+# 7. USER INPUT SECTION
 # ============================================================
 st.header("Input Parameters")
 
@@ -272,7 +369,7 @@ allowable_settlement_mm = st.number_input(
 
 
 # ============================================================
-# 7. PREDICTION BUTTON
+# 8. PREDICTION BUTTON
 # ============================================================
 if st.button("Calculate Settlement"):
 
@@ -323,7 +420,7 @@ if st.button("Calculate Settlement"):
 
     st.write(f"GPR prediction uncertainty: **±{gpr_uncertainty_mm:.2f} mm**")
 
-    st.subheader("Settlement Prediction Graph")
+    st.subheader("Model Settlement Comparison")
 
     graph_data = pd.DataFrame({
         "Model": ["ANN", "SVR", "GPR", "Average"],
@@ -332,11 +429,28 @@ if st.button("Calculate Settlement"):
 
     st.bar_chart(graph_data, x="Model", y="Settlement (mm)")
 
+    st.subheader("Parametric Settlement Graph: Cc vs Total Settlement")
+
+    fig = plot_cc_settlement_graph(
+        gamma_emb=gamma_emb,
+        Hemb=Hemb,
+        B1=B1,
+        GWL=GWL,
+        Dpeat=Dpeat,
+        eo=eo
+    )
+
+    st.pyplot(fig)
+
     if average_mm <= allowable_settlement_mm:
         st.success("Status: SAFE based on average ML settlement and allowable settlement limit")
     else:
         st.error("Status: NOT SAFE based on average ML settlement and allowable settlement limit")
 
+
+    # ========================================================
+    # RECOMMENDED SAFE EMBANKMENT HEIGHT
+    # ========================================================
     st.header("Recommended Safe Embankment Height")
 
     (
@@ -393,7 +507,7 @@ if st.button("Calculate Settlement"):
 
 
 # ============================================================
-# 8. DISCLAIMER AND COPYRIGHT
+# 9. DISCLAIMER AND COPYRIGHT
 # ============================================================
 st.info(
     "Note: The app predicts 7-year settlement using ANN, SVR, and GPR models. "
@@ -402,4 +516,4 @@ st.info(
 )
 
 st.markdown("---")
-st.caption("© 2026 N.H.N 🍀. All rights reserved.")
+st.caption("© 2026 Hanim 🍀. All rights reserved.")
