@@ -120,6 +120,7 @@ st.markdown(
     <style>
     .stApp {
         background: #f4f7f6;
+        color: #17202A;
     }
 
     .block-container {
@@ -136,32 +137,63 @@ st.markdown(
     }
 
     .main-title h1 {
-        color: white;
+        color: white !important;
         margin-bottom: 4px;
         font-size: 42px;
         letter-spacing: 0;
     }
 
     .main-title p {
-        color: #dceee7;
+        color: #dceee7 !important;
         font-size: 18px;
         margin: 0;
     }
 
-    h2, h3 {
-        color: #12372A;
+    h1, h2, h3, h4, h5, h6 {
+        color: #12372A !important;
+    }
+
+    p, label, span {
+        color: #17202A !important;
+    }
+
+    [data-testid="stMarkdownContainer"] {
+        color: #17202A !important;
+    }
+
+    [data-testid="stWidgetLabel"] {
+        color: #17202A !important;
+        font-weight: 600;
     }
 
     [data-testid="stNumberInput"] {
         background: white;
         padding: 8px 10px 12px 10px;
         border-radius: 8px;
-        border: 1px solid #e1e8e4;
+        border: 1px solid #d7e1dc;
+    }
+
+    [data-testid="stNumberInput"] label,
+    [data-testid="stNumberInput"] label p {
+        color: #17202A !important;
+        font-weight: 600;
+    }
+
+    [data-testid="stNumberInput"] input {
+        background-color: #ffffff !important;
+        color: #17202A !important;
+        border: 1px solid #cfd8d3 !important;
+    }
+
+    [data-testid="stNumberInput"] button {
+        background-color: #eef3f1 !important;
+        color: #17202A !important;
+        border: 1px solid #cfd8d3 !important;
     }
 
     .stButton > button {
         background-color: #1B6B50;
-        color: white;
+        color: white !important;
         border-radius: 8px;
         border: none;
         padding: 0.7rem 1.4rem;
@@ -171,7 +203,7 @@ st.markdown(
 
     .stButton > button:hover {
         background-color: #144D3A;
-        color: white;
+        color: white !important;
     }
 
     [data-testid="stMetric"] {
@@ -181,9 +213,17 @@ st.markdown(
         border: 1px solid #d9e2dc;
     }
 
+    [data-testid="stMetric"] * {
+        color: #17202A !important;
+    }
+
     [data-testid="stDataFrame"] {
         background: white;
         border-radius: 8px;
+    }
+
+    .stAlert * {
+        color: inherit !important;
     }
     </style>
     """,
