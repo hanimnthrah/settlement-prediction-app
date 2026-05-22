@@ -132,12 +132,12 @@ st.markdown(
         background: linear-gradient(90deg, #12372A, #1B6B50);
         padding: 28px 34px;
         border-radius: 10px;
-        color: white;
+        color: #dceee7 !important;
         margin-bottom: 28px;
     }
 
     .main-title h1 {
-        color: white !important;
+        color: #dceee7 !important;
         margin-bottom: 4px;
         font-size: 42px;
         letter-spacing: 0;
@@ -337,10 +337,6 @@ if st.button("Calculate Settlement"):
     else:
         st.error("Status: NOT SAFE based on average ML settlement and allowable settlement limit")
 
-
-    # ========================================================
-    # RECOMMENDED SAFE EMBANKMENT HEIGHT
-    # ========================================================
     st.header("Recommended Safe Embankment Height")
 
     (
@@ -406,4 +402,4 @@ st.info(
 )
 
 st.markdown("---")
-st.caption("© 2026 Hanim 🍀. All rights reserved.")
+st.caption("© 2026 N.H.N 🍀. All rights reserved.")
