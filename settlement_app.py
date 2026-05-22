@@ -420,15 +420,6 @@ if st.button("Calculate Settlement"):
 
     st.write(f"GPR prediction uncertainty: **±{gpr_uncertainty_mm:.2f} mm**")
 
-    st.subheader("Model Settlement Comparison")
-
-    graph_data = pd.DataFrame({
-        "Model": ["ANN", "SVR", "GPR", "Average"],
-        "Settlement (mm)": [ann_mm, svr_mm, gpr_mm, average_mm]
-    })
-
-    st.bar_chart(graph_data, x="Model", y="Settlement (mm)")
-
     st.subheader("Parametric Settlement Graph: Cc vs Total Settlement")
 
     fig = plot_cc_settlement_graph(
@@ -447,10 +438,6 @@ if st.button("Calculate Settlement"):
     else:
         st.error("Status: NOT SAFE based on average ML settlement and allowable settlement limit")
 
-
-    # ========================================================
-    # RECOMMENDED SAFE EMBANKMENT HEIGHT
-    # ========================================================
     st.header("Recommended Safe Embankment Height")
 
     (
@@ -490,20 +477,6 @@ if st.button("Calculate Settlement"):
         st.dataframe(safe_table, use_container_width=True)
 
         st.write(f"GPR uncertainty at safe Hemb: **±{safe_uncertainty:.2f} mm**")
-
-        st.subheader("Settlement at Recommended Safe Height")
-
-        safe_graph_data = pd.DataFrame({
-            "Model": ["ANN", "SVR", "GPR", "Average"],
-            "Settlement (mm)": [
-                safe_ann,
-                safe_svr,
-                safe_gpr,
-                safe_average
-            ]
-        })
-
-        st.bar_chart(safe_graph_data, x="Model", y="Settlement (mm)")
 
 
 # ============================================================
